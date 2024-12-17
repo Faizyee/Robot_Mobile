@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"> <!-- Menentukan karakter set untuk dokumen -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Mengatur viewport untuk responsivitas -->
+    <title>Robot Mobile</title> <!-- Judul halaman yang akan ditampilkan di tab browser -->
+    <style>
+        /* Mengatur margin dan padding untuk seluruh halaman */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html {
+            background-color: white;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
+        /* Mengatur container utama untuk posisi di tengah halaman */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* Menjaga kontainer utama berada di tengah */
+            align-items: center;
+            /* Menjaga elemen di dalamnya tetap di tengah */
+            height: 100vh;
+            /* Menjaga kontainer agar memanfaatkan seluruh tinggi layar */
+            font-family: Arial, sans-serif;
+            background-color: white;
+        }
+        
+        /* Mengatur styling tombol */
+        .button {
+            background-color: #4CAF50;
+            /* Warna hijau */
+            color: white;
+            border: none;
+            width: 100px;
+            height: 100px;
+            /* Membesarkan padding tombol */
+            font-size: 48px;
+            /* Membesarkan ukuran font */
+            cursor: pointer;
+            border-radius: 10px;
+            /* Memperbesar border-radius untuk efek melengkung lebih besar */
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mengatur posisi tombol dalam kolom */
+        .column {
+            width: 310px;
+            /* Menentukan lebar kolom agar lebih besar sesuai dengan ukuran tombol */
+            height: 310px;
+            /* Menentukan tinggi kolom */
+            position: relative;
+            /* Mengaktifkan positioning absolut untuk tombol */
+            border: 1px solid #ddd;
+            /* Memberikan border agar lebih jelas */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+            /* Menambahkan gap antar tombol */
+        }
+
+        /* Tombol atas */
+        #btn-up {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Tombol bawah */
+        #btn-down {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Tombol kiri */
+        #btn-left {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+        }
+
+        /* Tombol kanan */
+        #btn-right {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+        }
+
+        /* Styling untuk spasi dalam tombol */
+        .bspan {
+            font-size: 48px;
+            /* Membesarkan ukuran font dalam tombol */
+        }
+
+        /* Membuat seekbar terlihat lebih menarik */
+        .seekbar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Styling seekbar */
+        .seekbar {
+            width: 300px;
+            height: 10px;
+            border-radius: 5px;
+            background: #ddd;
+            cursor: pointer;
+            margin-top: 40px;
+        }
+
+        /* Styling untuk label yang menampilkan nilai seekbar */
+        #seekbar-value {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        /* Mengatur tombol tambahan di bawah */
+        div[style="width: 220px; position: relative; margin-top: 20px;"] {
+            display: flex;
+            justify-content: space-around;
+            width: 220px;
+        }
+        
+        /* Styling untuk tombol lampu dan speaker */
+        .b {
+            background-color: #f39c12;
+            /* Warna oranye */
+            color: white;
+            border: none;
+            padding: 20px;
+            /* Membesarkan padding tombol */
+            font-size: 40px;
+            /* Membesarkan ukuran font */
+            border-radius: 50%;
+            width: 80px;
+            /* Membesarkan ukuran tombol bundar */
+            height: 80px;
+            /* Membesarkan ukuran tombol bundar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        /* Mengatur jarak antara tombol-tombol */
+        .blamp {
+            margin-right: 10px;
+        }
+
+        .bspeak {
+            margin-left: 10px;
+        }
+
+        /* Mengatur container utama untuk "start" agar tampil di tengah halaman */
+        .start-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* Menjaga kontainer berada di tengah secara vertikal */
+            align-items: center;
+            /* Menjaga elemen di dalamnya tetap di tengah secara horizontal */
+            width: 100%;
+            height: 100vh;
+            /* Menggunakan seluruh tinggi layar */
+            position: fixed;
+            /* Agar tetap di tengah halaman */
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            /* Agar selalu berada di atas konten lainnya */
+            display: none;
+            /* Awalnya tersembunyi dengan kelas 'hidden' */
+            background-color: white;
+        }
+
+        /* Menampilkan container jika kelas 'hidden' dihapus */
+        .start-container:not(.hidden) {
+            display: flex;
+        }
+
+        /* Styling untuk pesan kesalahan */
+        .error-message {
+            color: red;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Styling untuk tombol "Mulai" */
+        #btn-start {
+            width: 200px;
+            /* Lebar tombol */
+            padding: 15px;
+            background-color: #4CAF50;
+            /* Warna tombol hijau */
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #btn-start:active {
+            background-color: #45a049;
+            /* Warna tombol saat hover */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Rotasi untuk tombol atas */
+        #btn-up .bspan {
+            transform: rotate(270deg);
+            /* Memutar 270 derajat untuk menunjukkan atas */
+        }
+
+        /* Rotasi untuk tombol bawah */
+        #btn-down .bspan {
+            transform: rotate(90deg);
+            /* Memutar 90 derajat untuk menunjukkan bawah */
+        }
+
+        /* Rotasi untuk tombol kiri */
+        #btn-left .bspan {
+            transform: rotate(180deg);
+            /* Memutar 180 derajat untuk menunjukkan kiri */
+        }
+
+        /* Rotasi untuk tombol kanan */
+        #btn-right .bspan {
+            transform: rotate(0deg);
+            /* Tidak ada rotasi, tetap ke kanan */
+        }
+
+        #id-connect {
+            font-size: 12px;
+        }
+
+        @media (orientation: landscape) {
+            body {
+                display: none;
+            }
+
+            html::before {
+                content: "Tidak bisa berjalan dalam mode ini.";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: black;
+                font-size: 24px;
+                font-weight: bold;
+                overflow: hidden;
+                text-align: center;
+                white-space: nowrap;
+            }
+        }
+
+        @media (orientation: portrait) {
+            body {
+                display: block;
+            }
+
+            html.no-text::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Container untuk input IP dan tombol mulai -->
+    <div id="start" class="start-container">
+        <span id="error-message" class="error-message"></span> <!-- Tempat untuk menampilkan pesan kesalahan -->
+        <button id="btn-start" type="button" onclick="connect()">Mulai</button> <!-- Tombol untuk memulai koneksi -->
+    </div>
+
+    <!-- Container utama yang tersembunyi sampai koneksi berhasil -->
+    <div id="main" class="main-container hidden">
+        <div class="column">
+            <button class="button batas" id="btn-up"><span class="bspan">></span></button>
+            <!-- Tombol untuk gerakan atas kiri -->
+            <button class="button bbawah" id="btn-down"><span class="bspan">></span></button>
+            <span id="id-connect">Connection</span>
+            <!-- Tombol untuk gerakan bawah kiri -->
+            <button class="button bkiri" id="btn-left"><span class="bspan">></span></button>
+            <!-- Tombol untuk gerakan atas kanan -->
+            <button class="button bkanan" id="btn-right"><span class="bspan">></span></button>
+            <!-- Tombol untuk gerakan bawah kanan -->
+        </div>
+        <div class="seekbar-container">
+            <input type="range" min="0" max="255" value="180" id="seekbar" class="seekbar">
+            <!-- Seekbar untuk mengatur kecepatan -->
+            <label id="seekbar-value">Kecepatan 180</label> <!-- Label untuk menampilkan nilai seekbar -->
+        </div>
+        <div style="width: 220px; position: relative; margin-top: 20px;">
+            <button class="b blamp" id="btn-lamp"><span class="bspan">💡</span></button>
+            <button class="b bspeak" id="btn-speak"><span class="bspan">🔊</span></button>
+        </div>
+    </div>
+
+    <script>
+        let ws = undefined; // Variabel untuk menyimpan koneksi WebSocket
+
+        // Fungsi untuk menghubungkan WebSocket
+        function connect() {
+            var errorMessage = document.getElementById('error-message'); // Mengambil elemen pesan kesalahan
+
+            // Memeriksa apakah WebSocket didukung
+            if (window.WebSocket) {
+                ws = new WebSocket("ws://180.150.20.150:81"); // Membuat koneksi WebSocket
+
+                errorMessage.textContent = "Menghubungkan..."; // Menampilkan status menghubungkan
+                errorMessage.style.color = "#000000"; // Mengubah warna pesan status
+
+                // Menangani koneksi berhasil
+                ws.onopen = () => {
+                    errorMessage.textContent = "Tersambung!"; // Menampilkan pesan berhasil terhubung
+                    errorMessage.style.color = "#4ae73c"; // Mengubah warna pesan sukses
+                    setTimeout(function () {
+                        if (typeof ws != 'undefined') {
+                            if (ws.readyState === WebSocket.OPEN) {
+                                document.getElementById('main').classList.remove('hidden'); // Menampilkan container utama
+                                document.getElementById('start').classList.add('hidden'); // Menyembunyikan container awal
+                                sendState();
+                            } else {
+                                document.getElementById('start').classList.remove('hidden');
+                                document.getElementById('main').classList.add('hidden');
+                            }
+                        } else {
+                            // Jika WebSocket tidak terbuka, tampilkan container utama
+                            document.getElementById('start').classList.remove('hidden');
+                            document.getElementById('main').classList.add('hidden');
+                        }
+                    }, 1000); // Menunggu 1 detik sebelum mengubah tampilan
+                }
+
+                // Menangani koneksi ditutup
+                ws.onclose = () => {
+                    errorMessage.textContent = "Gagal terkoneksi!"; // Menampilkan pesan gagal terhubung
+                    errorMessage.style.color = "#e74c3c"; // Mengubah warna pesan kesalahan
+                    ws = undefined; // Mengatur ws menjadi undefined
+                }
+
+                ws.onmessage = (event) => {
+                    document.getElementById("id-connect").textContent = event.data;
+                }
+
+                // Menangani kesalahan pada koneksi
+                ws.onerror = (error) => {
+                    errorMessage.textContent = "Error: " + error; // Menampilkan pesan kesalahan
+                    errorMessage.style.color = "#e74c3c"; // Mengubah warna pesan kesalahan
+                    ws = undefined; // Mengatur ws menjadi undefined
+                }
+            } else {
+                errorMessage.textContent = "WebSockets tidak didukung."; // Pesan jika WebSocket tidak didukung
+                return; // Menghentikan eksekusi
+            }
+        }
+
+        // Objek untuk menyimpan status tombol dan kecepatan
+        const buttonState = {
+            button: {
+                up: false,
+                down: false,
+                left: false,
+                right: false,
+            },
+            speed: 180, // Kecepatan awal
+            lamp: false,
+            buzz: false,
+        };
+
+        // Fungsi untuk mengirim status tombol melalui WebSocket
+        function sendState() {
+            const data = {
+                data: buttonState // Mengemas status tombol dalam objek
+            };
+            if (typeof ws != 'undefined') {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify(data)); // Mengirim data sebagai string JSON
+                } else {
+                    document.getElementById('start').classList.remove('hidden');
+                    document.getElementById('main').classList.add('hidden');
+                }
+            } else {
+                // Jika WebSocket tidak terbuka, tampilkan container utama
+                document.getElementById('start').classList.remove('hidden');
+                document.getElementById('main').classList.add('hidden');
+            }
+        }
+
+        // Mengambil elemen seekbar dan label nilai
+        const seekbar = document.getElementById("seekbar");
+        const seekbarValue = document.getElementById("seekbar-value");
+
+        // Menangani perubahan pada seekbar
+        seekbar.addEventListener("input", () => {
+            seekbarValue.textContent = "Kecepatan " + seekbar.value; // Memperbarui label dengan nilai seekbar
+            buttonState["speed"] = seekbar.value; // Mengatur kecepatan dalam objek status
+            sendState(); // Mengirim status baru
+        });
+
+        // Mengambil tombol kontrol arah
+        const btnUp = document.getElementById("btn-up");
+        const btnDown = document.getElementById("btn-down");
+        const btnLeft = document.getElementById("btn-left");
+        const btnRight = document.getElementById("btn-right");
+        const btnLamp = document.getElementById("btn-lamp");
+        const btnSpeak = document.getElementById("btn-speak");
+
+        // Fungsi untuk menangani saat tombol ditekan
+        function handlePress(button, name, stateKey, direction) {
+            button.style.backgroundColor = '#45a049';
+            buttonState[stateKey][direction] = true; // Mengatur status tombol menjadi ditekan
+            sendState(); // Mengirim status baru
+        }
+
+        // Fungsi untuk menangani saat tombol dilepaskan
+        function handleRelease(button, name, stateKey, direction) {
+            button.style.backgroundColor = '#4CAF50';
+            buttonState[stateKey][direction] = false; // Mengatur status tombol menjadi tidak ditekan
+            sendState(); // Mengirim status baru
+        }
+
+        // Menambahkan event listener untuk tombol kiri atas
+        btnUp.addEventListener("touchstart", () => handlePress(btnUp, "Left Up", "button", "up"), {
+            passive: true
+        });
+        btnUp.addEventListener("touchend", () => handleRelease(btnUp, "Left Up", "button", "up"), {
+            passive: true
+        });
+        btnUp.addEventListener("touchcancel", () => handleRelease(btnUp, "Left Up", "button", "up"), {
+            passive: true
+        });
+
+        // Menambahkan event listener untuk tombol kiri bawah
+        btnDown.addEventListener("touchstart", () => handlePress(btnDown, "Left Down", "button", "down"), {
+            passive: true
+        });
+        btnDown.addEventListener("touchend", () => handleRelease(btnDown, "Left Down", "button", "down"), {
+            passive: true
+        });
+        btnDown.addEventListener("touchcancel", () => handleRelease(btnDown, "Left Down", "button", "down"), {
+            passive: true
+        });
+
+        // Menambahkan event listener untuk tombol kanan atas
+        btnLeft.addEventListener("touchstart", () => handlePress(btnLeft, "Right Up", "button", "left"), {
+            passive: true
+        });
+        btnLeft.addEventListener("touchend", () => handleRelease(btnLeft, "Right Up", "button", "left"), {
+            passive: true
+        });
+        btnLeft.addEventListener("touchcancel", () => handleRelease(btnLeft, "Right Up", "button", "left"), {
+            passive: true
+        });
+
+        // Menambahkan event listener untuk tombol kanan bawah
+        btnRight.addEventListener("touchstart", () => handlePress(btnRight, "Right Down", "button", "right"), {
+            passive: true
+        });
+        btnRight.addEventListener("touchend", () => handleRelease(btnRight, "Right Down", "button", "right"), {
+            passive: true
+        });
+        btnRight.addEventListener("touchcancel", () => handleRelease(btnRight, "Right Down", "button", "right"), {
+            passive: true
+        });
+
+        // lamp
+        btnLamp.addEventListener("touchstart", () => {
+            btnLamp.style.backgroundColor = '#e67e22';
+            buttonState["lamp"] = true;
+            sendState();
+        }, {
+            passive: true
+        });
+        btnLamp.addEventListener("touchend", () => {
+            btnLamp.style.backgroundColor = '#f39c12';
+            buttonState["lamp"] = false;
+            sendState();
+        }, {
+            passive: true
+        });
+        btnLamp.addEventListener("touchcancel", () => {
+            btnLamp.style.backgroundColor = '#f39c12';
+            buttonState["lamp"] = false;
+            sendState();
+        }, {
+            passive: true
+        });
+
+        // buzzer
+        btnSpeak.addEventListener("touchstart", () => {
+            btnSpeak.style.backgroundColor = '#e67e22';
+            buttonState["buzz"] = true;
+            sendState();
+        }, {
+            passive: true
+        });
+        btnSpeak.addEventListener("touchend", () => {
+            btnSpeak.style.backgroundColor = '#f39c12';
+            buttonState["buzz"] = false;
+            sendState();
+        }, {
+            passive: true
+        });
+        btnSpeak.addEventListener("touchcancel", () => {
+            btnSpeak.style.backgroundColor = '#f39c12';
+            buttonState["buzz"] = false;
+            sendState();
+        }, {
+            passive: true
+        });
+
+        // Menangani penutupan jendela
+        window.addEventListener('beforeunload', function (event) {
+            if (typeof ws != 'undefined') {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.close();
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>
